@@ -1,0 +1,99 @@
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         EMAIL VERIFICATION SYSTEM --------
+└─────────────────────────────────────────────────────────────────────────┘
+
+  Step 1: User Registration
+  ┌──────────────┐
+  │   POST /api/users/  │
+  │  {username, email,  │
+  │   password, password2}│
+  └────────┬─────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                      Django REST API                              │
+  │  1. Validate data (serializer)                                   │
+  │  2. Create User in Database                                       │
+  │  3. Generate 6-digit verification code (e.g., "482719")         │
+  │  4. Create EmailVerification record                               │
+  └────────┬─────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                      Celery Task Queue                            │
+  │  send_verification_email.delay(user_id, code)                    │
+  │  (This runs in BACKGROUND - user doesn't wait!)                  │
+  └────────┬─────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                         Redis Broker                              │
+  │  Task stored in Redis queue: "Send email to user@example.com"    │
+  └────────┬─────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                       Celery Worker                               │
+  │  Picks up task from Redis and processes it                       │
+  └────────┬─────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                         Email Sent!                               │
+  │  ┌────────────────────────────────────────────────────────┐      │
+  │  │  To: user@example.com                                   │      │
+  │  │  Subject: Verify Your Email Address                     │      │
+  │  │  ────────────────────────────────────────────────────   │      │
+  │  │  Your verification code is:                             │      │
+  │  │                                                          │      │
+  │  │              [ 4 8 2 7 1 9 ]                            │      │
+  │  │                                                          │      │
+  │  │  This code expires in 10 minutes                        │      │
+  │  └────────────────────────────────────────────────────────┘      │
+  └──────────────────────────────────────────────────────────────────┘
+
+  Step 2: User Verification
+  ┌──────────────┐
+  │ POST /api/users/verify-email/ │
+  │ {email: "user@example.com",   │
+  │  verification_code: "482719"} │
+  └────────┬──────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                      Django REST API                              │
+  │  1. Check if email exists                                         │
+  │  2. Check if code matches                                         │
+  │  3. Check if code not expired (10 minutes)                       │
+  │  4. Check if not already verified                                │
+  └────────┬─────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                    Update Database                                │
+  │  • User.is_email_verified = True                                 │
+  │  • User.email_verified_at = now()                                │
+  │  • EmailVerification.status = 'verified'                         │
+  └────────┬─────────────────────────────────────────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                   Send Welcome Email (Celery)                     │
+  │  "Welcome to our platform! Your email is verified."              │
+  └──────────────────────────────────────────────────────────────────┘
+
+  Step 3: User Login
+  ┌──────────────┐
+  │ POST /api/token/ │
+  │ {username, password} │
+  └────────┬──────────────────────┘
+           │
+           ▼
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                      JWT Token Generated                          │
+  │  {                                                               │
+  │    "access": "eyJhbGciOiJIUzI1NiIs...",                         │
+  │    "refresh": "eyJhbGciOiJIUzI1NiIs..."                         │
+  │  }                                                               │
+  └──────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,23 @@
+যখন send_verification_email.delay() কল হয়:
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    CELERY ARCHITECTURE                       │
+│                                                              │
+│  ┌──────────────┐     ┌──────────────┐     ┌─────────────┐ │
+│  │ Django App   │────▶│ Redis Broker │────▶│ Celery      │ │
+│  │ calls .delay()│     │ (Queue)      │     │ Worker      │ │
+│  └──────────────┘     └──────────────┘     └──────┬──────┘ │
+│                                                    │        │
+│                                         ┌──────────▼──────┐ │
+│                                         │ Email Sent!     │ │
+│                                         └─────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+
+ডিটেইল:
+1. Django `send_verification_email.delay()` কল করে
+2. Task JSON আকারে Redis-এ store হয়
+3. Celery Worker Redis থেকে task টি pick করে
+4. Worker SMTP দিয়ে email send করে
+5. Result database-এ save হয়
+6. Log তৈরি হয় VerificationLog এ
