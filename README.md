@@ -86,6 +86,176 @@ Key Features:
 
 
 
+# 🔐 Advanced Security System Documentation
+
+Complete security monitoring system with Suspicious Activity Detection, Session Management, and Real-time Alerts.
+
+---
+
+## 📋 Table of Contents
+- [Overview](#overview)
+- [Security Models](#security-models)
+- [Features](#features)
+- [API Endpoints](#api-endpoints)
+- [Configuration](#configuration)
+- [Usage Examples](#usage-examples)
+
+---
+
+## 🎯 Overview
+
+The security system provides comprehensive protection through:
+- 🕵️ **Suspicious Activity Tracking** - Monitor and log suspicious user behavior
+- 🔐 **Login Session Management** - Track user sessions with device & location info
+- 🚨 **Real-time Security Alerts** - Instant notifications for security threats
+- 📊 **Security Metrics** - Daily analytics and reporting
+
+---
+
+## 🗄️ Security Models
+
+### 1. 🕵️ SuspiciousActivity Model
+
+Tracks all suspicious activities in the system.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| 👤 `user` | ForeignKey | Affected user (optional) |
+| 🏷️ `activity_type` | Choice | Type of suspicious activity |
+| ⚠️ `severity` | Integer | 1=Low, 2=Medium, 3=High, 4=Critical |
+| 🌐 `ip_address` | GenericIPAddress | Source IP address |
+| 📍 `location` | CharField | Geographical location |
+| 💻 `user_agent` | TextField | Browser/device information |
+| 📱 `device_info` | JSONField | Detailed device information |
+| 📝 `details` | TextField | Activity description |
+| 📦 `metadata` | JSONField | Additional context data |
+| ✅ `is_resolved` | Boolean | Resolution status |
+| 👨‍💼 `resolved_by` | CharField | Who resolved the issue |
+| 📌 `resolution_note` | TextField | Resolution details |
+
+**Activity Types:**
+- 🔨 `brute_force` - Brute Force Attack
+- ❌ `multiple_failed` - Multiple Failed Logins
+- 🌍 `unusual_location` - Unusual Location Login
+- 📱 `unusual_device` - Unusual Device Login
+- 🕐 `unusual_time` - Unusual Time Login
+- 🔑 `verification_failed` - Multiple Verification Failures
+- 🧊 `account_frozen` - Account Frozen
+- 🔄 `password_reset_abuse` - Password Reset Abuse
+
+---
+
+### 2. 🔐 LoginSession Model
+
+Tracks user login sessions with device and location information.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| 👤 `user` | ForeignKey | Logged-in user |
+| 🎫 `session_token` | CharField | Unique session identifier |
+| ⚡ `is_active` | Boolean | Session active status |
+| 📱 `device_type` | CharField | Mobile/Desktop/Tablet |
+| 📱 `device_name` | CharField | Device model/name |
+| 🌐 `browser` | CharField | Browser name |
+| 🔢 `browser_version` | CharField | Browser version |
+| 💿 `os` | CharField | Operating system |
+| 🔢 `os_version` | CharField | OS version |
+| 🌐 `ip_address` | GenericIPAddress | Login IP address |
+| 📍 `location` | CharField | Geographical location |
+| 📡 `isp` | CharField | Internet Service Provider |
+| 🔐 `used_2fa` | Boolean | 2FA used during login |
+| 🔢 `otp_code_used` | CharField | OTP code used |
+| 🕐 `login_time` | DateTime | Session start time |
+| 🔄 `last_activity` | DateTime | Last activity timestamp |
+| 🚪 `logout_time` | DateTime | Session end time |
+
+---
+
+### 3. 🚨 SecurityAlert Model
+
+Real-time security alerts for immediate action.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| 📌 `title` | CharField | Alert title |
+| 🏷️ `alert_type` | Choice | Type of security alert |
+| ⚠️ `priority` | Integer | 1=Low, 2=Medium, 3=High, 4=Urgent |
+| 👤 `user` | ForeignKey | Affected user |
+| 🔗 `suspicious_activity` | ForeignKey | Related suspicious activity |
+| 💬 `message` | TextField | Alert description |
+| 🌐 `ip_address` | GenericIPAddress | Source IP |
+| 📍 `location` | CharField | Location of incident |
+| 👁️ `is_read` | Boolean | Alert read status |
+| ✅ `is_acknowledged` | Boolean | Admin acknowledged |
+| 👨‍💼 `acknowledged_by` | CharField | Who acknowledged |
+| 🛠️ `action_taken` | TextField | Response action taken |
+
+**Alert Types:**
+- 🔑 `suspicious_login` - Suspicious Login Detected
+- 🔨 `brute_force` - Brute Force Detected
+- 💀 `data_breach` - Potential Data Breach
+- 🎯 `account_takeover` - Account Takeover Attempt
+- 🚫 `api_abuse` - API Abuse Detected
+
+---
+
+## ✨ Features
+
+| Feature | Icon | Description |
+|---------|------|-------------|
+| Brute Force Detection | 🔨 | Auto-detects multiple failed login attempts |
+| Location Tracking | 🌍 | Tracks login locations worldwide |
+| Device Fingerprinting | 📱 | Identifies unique devices |
+| Session Management | 🔐 | Manages active user sessions |
+| Real-time Alerts | 🚨 | Instant security notifications |
+| 2FA Support | 🔑 | Two-factor authentication integration |
+| IP Blacklisting | 🚫 | Block malicious IP addresses |
+| Security Metrics | 📊 | Daily security analytics |
+
+---
+
+## 🔧 API Endpoints
+
+### Suspicious Activity Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `GET` | `/security/suspicious/` | List all suspicious activities | 🔐 Admin |
+| `POST` | `/security/suspicious/{id}/resolve/` | Resolve an activity | 🔐 Admin |
+| `GET` | `/security/my-security/` | User's security status | 🔐 User |
+
+### Session Management Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `GET` | `/users/sessions/` | List user sessions | 🔐 User |
+| `POST` | `/users/logout/` | Logout from session | 🔐 User |
+| `POST` | `/users/logout-all/` | Logout from all devices | 🔐 User |
+
+### Security Alert Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `GET` | `/security/alerts/` | List security alerts | 🔐 Admin |
+| `POST` | `/security/alerts/{id}/acknowledge/` | Acknowledge alert | 🔐 Admin |
+| `GET` | `/security/dashboard/` | Security dashboard | 🔐 Admin |
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables (.env)
+
+```env
+# Redis Configuration
+REDIS_PASSWORD=your_redis_password
+REDIS_HOST=localhost
+REDIS_PORT=6380
+
+# Security Settings
+SECURITY_RATE_LIMIT=5
+SECURITY_BLOCK_DURATION=300
+SECURITY_MAX_ATTEMPTS=5
 
 ## 📦 Installation
 
