@@ -97,6 +97,8 @@ Redis Server
 Git
 PostgreSQL (optional)
 
+📁 .env File
+
 # Django
 DJANGO_SECRET_KEY=your-secret-key
 DJANGO_DEBUG=True
@@ -126,6 +128,8 @@ EMAIL_HOST_PASSWORD=your-app-password
 python manage.py makemigrations
 python manage.py migrate
 
+
+🌸 Celery Terminal
 # Terminal 1: Redis Server
 redis-server
 
@@ -140,6 +144,10 @@ celery -A ai flower --port=5555
 
 # Terminal 5: Django Server
 python manage.py runserver
+
+# Terminal 5 : Celery Starter
+python manage.py runcelery -f "celery -A ai flower --port=5555"
+
 
 📊 Monitoring & Management
 Celery Monitoring Tools
