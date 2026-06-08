@@ -65,6 +65,27 @@
 | **Swagger/ReDoc** | 📚 | API documentation |
 
 ---
+🚀 About Me
+
+I am Abid Hasan, a passionate Backend Engineer specialized in building scalable, high-performance web application, Software using Django, Celery, Redis, and modern AI technologies. I have successfully designed and deployed GenWrite AI — a fully functional AI-powered content generation platform that serves thousands of users with real-time content creation capabilities.
+
+I developed GenWrite AI — a complete AI-powered content generation platform that demonstrates my ability to build production-ready systems.
+
+Key Features:
+🤖 AI Content Generation - Integrated OpenAI GPT-3.5 for blog, article, and cover letter generation
+
+⚡ Bulk Processing - Parallel task processing with Celery (100+ tasks simultaneously)
+
+📊 Task Management - Real-time task tracking, cancellation, and retry mechanisms
+
+🔐 Secure Authentication - JWT-based authentication with refresh tokens
+
+📈 Analytics Dashboard - Usage statistics and performance metrics
+
+📧 Email Notifications - Automated email alerts using Celery tasks
+
+
+
 
 ## 📦 Installation
 
@@ -356,11 +377,249 @@ Response (200 OK - Completed):
                 "generated_content": "# Machine Learning\n\nMachine Learning is a subset of AI...",
                 "processing_time": 3.8,
                 "tokens_used": 480
-            }
-        ],
+            },
+
         "created_at": "2026-06-07T10:35:00Z",
         "completed_at": "2026-06-07T10:35:12Z"
     },
     "message": "Batch progress retrieved"
 }
+],        
 
+
+❌ Cancel Task
+
+POST http://localhost:8000/api/v1/content/tasks/f47ac10b-58cc-4372-a567-0e02b2c3d479/cancel/
+Authorization: Bearer your_access_token
+
+Response (200 OK):
+
+{
+    "success": true,
+    "message": "Task cancelled successfully",
+    "data": {
+        "task_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    }
+}
+
+🔄 Retry Failed Task
+POST http://localhost:8000/api/v1/content/tasks/f47ac10b-58cc-4372-a567-0e02b2c3d480/retry/
+Authorization: Bearer your_access_token
+
+Response (202 Accepted):
+
+{
+    "success": true,
+    "data": {
+        "new_task_id": "f47ac10b-58cc-4372-a567-0e02b2c3d484",
+        "original_task_id": "f47ac10b-58cc-4372-a567-0e02b2c3d480",
+        "status": "pending",
+        "retry_count": 1
+    },
+    "message": "Task regeneration started"
+}
+
+📈 Dashboard Statistics
+GET http://localhost:8000/api/v1/content/tasks/dashboard/
+Authorization: Bearer your_access_token
+
+Response (200 OK):
+
+{
+    "success": true,
+    "data": {
+        "summary": {
+            "total_tasks": 45,
+            "completed_tasks": 38,
+            "pending_tasks": 3,
+            "processing_tasks": 2,
+            "failed_tasks": 2,
+            "cancelled_tasks": 0,
+            "completion_rate": 84.44,
+            "avg_processing_time": 3.45,
+            "total_tokens_used": 18750,
+            "total_cost": "0.037500"
+        },
+        "daily_stats": [
+            {"day": "2026-06-01", "count": 5},
+            {"day": "2026-06-02", "count": 8},
+            {"day": "2026-06-03", "count": 12},
+            {"day": "2026-06-04", "count": 7},
+            {"day": "2026-06-05", "count": 6},
+            {"day": "2026-06-06", "count": 4},
+            {"day": "2026-06-07", "count": 3}
+        ]
+    },
+    "message": "Dashboard statistics retrieved"
+}
+
+📊 Status Summary
+GET http://localhost:8000/api/v1/content/tasks/status-summary/
+Authorization: Bearer your_access_token
+
+Response (200 OK):
+
+{
+    "success": true,
+    "data": {
+        "pending": 3,
+        "processing": 2,
+        "completed": 38,
+        "failed": 2,
+        "cancelled": 0
+    },
+    "message": "Status summary retrieved"
+}
+
+📋 Get All Batches
+GET http://localhost:8000/api/v1/content/batches/
+Authorization: Bearer your_access_token
+
+Response (200 OK):
+{
+    "success": true,
+    "data": {
+        "count": 8,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "name": "Tech Blog Series",
+                "status": "completed",
+                "total_tasks": 3,
+                "completed_tasks": 3,
+                "failed_tasks": 0,
+                "progress_percentage": 100.0,
+                "created_at": "2026-06-07T10:35:00Z",
+                "completed_at": "2026-06-07T10:35:12Z"
+            },
+            {
+                "id": "660e8400-e29b-41d4-a716-446655440001",
+                "name": "Marketing Content",
+                "status": "processing",
+                "total_tasks": 5,
+                "completed_tasks": 2,
+                "failed_tasks": 0,
+                "progress_percentage": 40.0,
+                "created_at": "2026-06-07T11:00:00Z",
+                "completed_at": null
+            }
+        ]
+    },
+    "message": "Batches retrieved successfully"
+}
+
+
+
+
+📐 Detailed System Architecture
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENT LAYER                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
+│  │  React   │  │   Vue    │  │ Angular  │  │  Mobile  │  │  cURL/   │      │
+│  │   Web    │  │   Web    │  │   Web    │  │   App    │  │ Postman  │      │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘      │
+│       │             │             │             │             │             │
+│       └─────────────┴─────────────┴─────────────┴─────────────┘             │
+│                                    │ HTTPS                                  │
+└────────────────────────────────────┼────────────────────────────────────────┘
+                                     │
+┌────────────────────────────────────┼────────────────────────────────────────┐
+│                          LOAD BALANCER LAYER                                │
+│                                     ▼                                       │
+│                          ┌─────────────────┐                               │
+│                          │  Nginx/HAProxy  │                               │
+│                          │  Port: 80/443   │                               │
+│                          └────────┬────────┘                               │
+└───────────────────────────────────┼────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────┼────────────────────────────────────────┐
+│                         APPLICATION LAYER                                   │
+│                    ┌────────────────┴────────────────┐                     │
+│                    ▼                                 ▼                     │
+│     ┌─────────────────────────┐     ┌─────────────────────────┐           │
+│     │   Django App Server 1   │     │   Django App Server 2   │           │
+│     │   (Gunicorn - 4 workers)│     │   (Gunicorn - 4 workers)│           │
+│     └───────────┬─────────────┘     └───────────┬─────────────┘           │
+│                 │                               │                          │
+│                 └───────────────┬───────────────┘                          │
+│                                 │                                          │
+│     ┌───────────────────────────┴───────────────────────────┐             │
+│     │                                                       │             │
+│     ▼                       ▼                               ▼             │
+│ ┌─────────────┐     ┌─────────────┐               ┌─────────────┐         │
+│ │  API Layer  │     │  Admin UI   │               │  Swagger/   │         │
+│ │   (DRF)     │     │  (Jazzmin)  │               │   ReDoc     │         │
+│ └─────────────┘     └─────────────┘               └─────────────┘         │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────┼────────────────────────────────────────┐
+│                         TASK QUEUE LAYER                                    │
+│                                 │                                          │
+│                    ┌────────────┴────────────┐                            │
+│                    ▼                         ▼                            │
+│     ┌─────────────────────────┐   ┌─────────────────────────┐             │
+│     │   Celery Beat           │   │   Celery Worker Pool    │             │
+│     │   (Scheduler)           │◄──│   (High Priority)       │             │
+│     │   - Periodic Tasks      │   │   - Content Generation  │             │
+│     │   - Daily Reports       │   │   - 10 workers          │             │
+│     └───────────┬─────────────┘   └───────────┬─────────────┘             │
+│                 │                             │                            │
+│                 │              ┌──────────────┴──────────────┐             │
+│                 │              ▼                             ▼             │
+│                 │   ┌─────────────────────┐   ┌─────────────────────┐      │
+│                 │   │  Celery Worker      │   │  Celery Worker      │      │
+│                 │   │  (Bulk Queue)       │   │  (Email Queue)      │      │
+│                 │   │  - 5 workers        │   │  - 3 workers        │      │
+│                 │   └─────────────────────┘   └─────────────────────┘      │
+└─────────────────┼─────────────────────────────────────────────────────────┘
+                  │
+┌─────────────────┼─────────────────────────────────────────────────────────┐
+│                          DATABASE & CACHE LAYER                            │
+│                 │                                                         │
+│    ┌────────────┴────────────┬────────────────────┬───────────────────┐  │
+│    ▼                         ▼                    ▼                   ▼  │
+│ ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌────────────┐│
+│ │  PostgreSQL  │    │   Redis      │    │   Redis      │    │   Redis    ││
+│ │  Primary DB  │    │   Cache      │    │   Session    │    │  Broker    ││
+│ │  - Tasks     │    │  - API Cache │    │  - User Auth │    │  - Celery  ││
+│ │  - Users     │    │  - Rate Limit│    │  - Sessions  │    │  - Message ││
+│ │  - Batches   │    │  - Templates │    │              │    │            ││
+│ └──────────────┘    └──────────────┘    └──────────────┘    └────────────┘│
+│         │                                                                  │
+│         ▼                                                                  │
+│ ┌──────────────┐                                                          │
+│ │  PostgreSQL  │                                                          │
+│ │  Replica DB  │                                                          │
+│ │  - Read Only │                                                          │
+│ └──────────────┘                                                          │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────┼────────────────────────────────────────┐
+│                         EXTERNAL SERVICES                                   │
+│                 │                                                          │
+│    ┌────────────┴────────────┬────────────────────┬────────────────┐      │
+│    ▼                         ▼                    ▼                ▼      │
+│ ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  ┌─────────────┐  │
+│ │  OpenAI API  │    │  Gmail/SMTP  │    │   Stripe     │  │   AWS S3    │  │
+│ │  - GPT-3.5   │    │  - Email     │    │  - Payment   │  │  - Media    │  │
+│ │  - Embeddings│    │  - Notify    │    │  - Webhook   │  │  - Static   │  │
+│ └──────────────┘    └──────────────┘    └──────────────┘  └─────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────┼────────────────────────────────────────┐
+│                         MONITORING LAYER                                    │
+│                 │                                                          │
+│    ┌────────────┴────────────┬────────────────────┬────────────────┐      │
+│    ▼                         ▼                    ▼                ▼      │
+
+│ ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  ┌─────────────┐  │
+│ │   Flower     │    │   Sentry     │    │  Prometheus  │  │  Grafana    │  │
+│ │  - Celery    │    │  - Errors    │    │  - Metrics   │  │  - Visual   │  │
+│ │  - Tasks     │    │  - Logs      │    │  - Alerts    │  │  - Dashboard│  │
+│ │  :5555       │    │              │    │              │  │             │  │
+│ └──────────────┘    └──────────────┘    └──────────────┘  └─────────────┘  │
+└───────────────────────────────────────────────────────────────────────────┘
