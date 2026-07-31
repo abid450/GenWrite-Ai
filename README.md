@@ -35,7 +35,6 @@
 | 📧 **Email Notifications** | Automated email alerts |
 
 ---
-
 ## 🛠️ Tech Stack
 
 ### Backend
