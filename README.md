@@ -18,7 +18,6 @@
 [Features](#✨-features) • [Installation](#📦-installation) • [API Docs](#📚-api-documentation) • [Tech Stack](#🛠️-tech-stack)
 
 </div>
-
 ---
 
 ## ✨ Features
